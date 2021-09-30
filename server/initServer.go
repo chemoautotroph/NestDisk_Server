@@ -2,13 +2,14 @@ package server
 
 import (
 	"fmt"
-	"goCloud/config"
-	"goCloud/utils"
 	"log"
+	"myServer/config"
+	"myServer/utils"
 	"net"
+	"time"
 )
 
-func init(){
+func Init(){
 	port := config.Config.GetString("port")
 	listener, err := net.Listen("tcp",port)
 	utils.ErrorRecorder(err)
@@ -24,10 +25,15 @@ func init(){
 }
 
 func handleConn(conn net.Conn){
-	// defer conn.Close()
+	dataBlockSize := 1024 * 100 // 100kb
+	err := conn.SetDeadline(time.Now().Add(time.Second*10))
+	if err != nil {
+		return
+	}
 	for{
-		buf := make([]byte,512)
+		buf := make([]byte,dataBlockSize)
 		n, err := conn.Read(buf)
+
 		if err != nil{
 			log.Fatalln("error reading ",err)
 			return
