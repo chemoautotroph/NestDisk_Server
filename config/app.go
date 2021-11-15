@@ -20,4 +20,3 @@ func initConfig() {
 func GetConfig() *viper.Viper {
 	return Config
 }
-

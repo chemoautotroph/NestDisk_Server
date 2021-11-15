@@ -1,5 +1,6 @@
 package config
 
-func init(){
+func init() {
 	initConfig()
+	mysqlConn()
 }
