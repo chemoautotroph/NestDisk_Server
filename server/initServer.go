@@ -22,8 +22,9 @@ func Init() {
 			log.Printf("listener error %v\n", err)
 			continue
 		}
+		log.Println("conn: ", conn)
 		//go handleConn(conn)
-		go giveJob(conn, pool)
+		go connHandler(conn, pool)
 	}
 }
 
@@ -53,9 +54,14 @@ func initWorkerPool() *WorkerPool {
 	return p
 }
 
-func giveJob(conn net.Conn, pool *WorkerPool) {
-	sc := &JobQueueInfo{Conn: conn}
-	pool.JobQueue <- sc
+func connHandler(conn net.Conn, pool *WorkerPool) {
+	if conn != nil{
+		sc := &JobQueueInfo{Conn: conn}
+		pool.JobQueue <- sc
+	} else {
+		log.Panic("invalid socket connection")
+	}
+
 }
 
 func activatedWorker (){

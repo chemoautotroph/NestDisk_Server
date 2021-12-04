@@ -7,30 +7,28 @@ import (
 	"myServer/config"
 )
 
-// 不在这儿作比较，用username找出并返回password
-//func login (username string, password string) (bool, error) {
-//	p, err := getPassword(username)
-//	if err != nil{
-//		return false, err
-//	}
-//	if p != password{
-//		return false, nil
-//	} else {
-//		return true, nil
-//	}
-//}
 
-func getPassword(username string) ( error){
+func login(username, password string) (string, error, string) {
+	p, err, errorMessage:= getPassword(username)
+	if err != nil {
+		return "invalid username", err, errorMessage
+	}
+	if p == password{
+		return "Login Successful", nil, errorMessage
+	} else {
+		return "invalid password",nil, errorMessage
+	}
+}
+
+func getPassword(username string) (string, error, string) {
 	db := config.GetDB()
 	p := Password{}
 	tx := db.Where("user_name = ?", username).Take(&p)
-	if errors.Is(tx.Error, gorm.ErrRecordNotFound){
-		// fmt.Println("No Data Find")
-		return tx.Error
-	} else if tx.Error != nil{
-		// fmt.Println("Query failed", tx.Error)
-		return  tx.Error
+	if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
+		return "", tx.Error, "No Data Find"
+	} else if tx.Error != nil {
+		return "", tx.Error, "Query failed"
 	}
-	log.Printf("id: %v, username: %v,  pssword: %v, create_date: %v \n",p.Id, p.UserName, p.Password, p.CreateAt)
-	return nil
+	log.Printf("id: %v, username: %v,  pssword: %v, create_date: %v \n", p.Id, p.UserName, p.Password, p.CreateAt)
+	return p.Password, nil, ""
 }
