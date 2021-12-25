@@ -41,6 +41,7 @@ func read(conn net.Conn, readerChannel chan []byte) error {
 		connInput := strings.Split(string(data), " ")
 		fCommand := connInput[0]
 		rCommand := connInput[1:]
+
 		fmt.Printf("first command is: %v\n", fCommand)
 		err := runCommand(fCommand, rCommand, conn)
 		if err != nil {

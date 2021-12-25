@@ -1,11 +1,14 @@
 package server
 
 import (
+	"bufio"
 	"fmt"
+	"io"
 	"log"
 	"myServer/config"
 	"myServer/utils"
 	"net"
+	"os"
 	"runtime"
 	"time"
 )
@@ -22,6 +25,7 @@ func Init() {
 			log.Printf("listener error %v\n", err)
 			continue
 		}
+		//sendLogo(conn)
 		log.Println("conn: ", conn)
 		//go handleConn(conn)
 		go connHandler(conn, pool)
@@ -68,5 +72,21 @@ func activatedWorker (){
 	for{
 		time.Sleep(2 * time.Second)
 		fmt.Printf("goroutine: %v\n", runtime.NumGoroutine())
+	}
+}
+
+func sendLogo (conn net.Conn){
+	file, err := os.Open("./logo.txt")
+	if err != nil{
+		fmt.Println("fail to open with err ", err)
+	}
+	defer file.Close()
+	reader := bufio.NewReader(file)
+	for{
+		str, err:= reader.ReadString('\n')
+		if err == io.EOF {
+			break
+		}
+		send(conn, []byte(str))
 	}
 }
